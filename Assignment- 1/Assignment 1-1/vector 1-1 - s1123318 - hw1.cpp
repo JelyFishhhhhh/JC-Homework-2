@@ -1,4 +1,4 @@
-#include "vector 1-4.h" // include definition of class vector 
+#include "vector 1-1.h" // include definition of class vector 
 
 // empty container constructor (default constructor)
 // Constructs an empty container, with no elements.
@@ -12,9 +12,40 @@ vector::vector()
 // Each element is initialized as 0.
 vector::vector( const size_type count )
 {
+   
+   if(!count){
 
+      return;
+   }
+   myFirst= new value_type[count]();
+   myLast= myFirst+ count;
+   myEnd= myLast;
 
+}
 
+// copy constructor
+// Constructs a container with a copy of each of the elements in "right",
+// in the same order.
+vector::vector( const vector &right )
+{
+
+   size_type vecSize= static_cast<size_type>(right.myLast- right.myFirst);
+   size_type vecCap= static_cast<size_type>(right.myEnd- right.myFirst);
+
+   if(!vecSize || !vecCap){
+
+      return;
+   }
+
+   myFirst= new value_type[vecCap]();
+   myLast= myFirst+ vecSize;
+   myEnd= myLast;
+
+   // copy value
+   for(size_type i= 0; i< vecSize; i++){
+
+      myFirst[i]= right.myFirst[i];
+   }
 }
 
 // Vector destructor
@@ -24,38 +55,6 @@ vector::~vector()
 {
    if( myFirst != nullptr )
       delete[] myFirst;
-}
-
-// Resizes the vector so that it contains newSize elements.
-// If newSize is smaller than the current vector size,
-// the content is reduced to its first newSize elements, removing those beyond.
-// If newSize is greater than the current vector size,
-// the content is expanded by inserting at the end
-// as many elements as needed to reach a size of newSize.
-// The new elements are initialized as 0.
-// If newSize is also greater than the current vector capacity,
-// an automatic reallocation of the allocated storage space takes place.
-void vector::resize( const size_type newSize )
-{
-   size_type originalSize = size();
-   if( newSize > originalSize )
-   {
-      if( newSize > capacity() )
-      {
-         size_type newCapacity = capacity() * 3 / 2;
-         if( newCapacity < newSize )
-            newCapacity = newSize;
-
-
-
-      }
-
-
-
-   }
-
-
-
 }
 
 // Removes all elements from the vector (which are destroyed),

@@ -1,4 +1,4 @@
-#include "vector 1-2.h" // include definition of class vector 
+#include "vector 1-3.h" // include definition of class vector 
 
 // empty container constructor (default constructor)
 // Constructs an empty container, with no elements.
@@ -13,7 +13,13 @@ vector::vector()
 vector::vector( const size_type count )
 {
 
+   if(!count){
 
+      return;
+   }
+   myFirst= new value_type[count]();
+   myLast= myFirst+ count;
+   myEnd= myLast;
 
 }
 
@@ -26,33 +32,48 @@ vector::~vector()
       delete[] myFirst;
 }
 
-// Assigns new contents to the container, replacing its current contents,
-// and modifying its size accordingly.
-// Copies all the elements from "right" into the container
-// (with "right" preserving its contents).
-vector& vector::assign( const vector &right )
+// Adds a new element at the end of the vector, after its current last element.
+// The content of val is copied to the new element.
+// This effectively increases the vector size by one,
+// which causes an automatic reallocation of the allocated storage space
+// if and only if the new vector size surpasses the current vector capacity.
+void vector::push_back( const value_type &val )
 {
-   if( this != &right ) // avoid self-assignment
+   size_type originalSize = size();
+   size_type originalCapacity = capacity();
+   if( originalSize == originalCapacity )
    {
-      size_type rightSize = right.myLast - right.myFirst;
-      if( rightSize > capacity() )
-      {
-         if( size() > 0 )
-            delete[] myFirst; // release space
+      size_type newCapacity;
+      if( originalCapacity <= 1 )
+         newCapacity = originalCapacity + 1;
+      else
+         newCapacity = originalCapacity * 3 / 2;
+      
+      value_type* newArr= new value_type[newCapacity];
+      for(size_type i= 0; i< originalSize; i++){
 
-         size_type newCapacity = capacity() * 3 / 2;
-         if( newCapacity < rightSize )
-            newCapacity = rightSize;
-
-
-
+         newArr[i]= myFirst[i];
       }
-
-
-
+      newArr[originalSize]= val;
+      delete[] myFirst;
+      myFirst= newArr;
+      myLast= myFirst+ originalSize+ 1;
+      myEnd= myFirst+ newCapacity;
+   }
+   else{
+      myFirst[originalSize]= val;
+      myLast= myFirst+ originalSize+ 1;
+      myEnd= myFirst+ originalCapacity;
    }
 
-   return *this; // enables x = y = z, for example
+}
+
+// Removes the last element in the vector,
+// effectively reducing the container size by one.
+void vector::pop_back()
+{
+   if( size() > 0 )
+      --myLast;
 }
 
 // Removes all elements from the vector (which are destroyed),

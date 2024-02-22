@@ -1,4 +1,4 @@
-#include "vector 1-3.h" // include definition of class vector 
+#include "vector 1-4.h" // include definition of class vector 
 
 // empty container constructor (default constructor)
 // Constructs an empty container, with no elements.
@@ -13,7 +13,13 @@ vector::vector()
 vector::vector( const size_type count )
 {
 
+   if(!count){
 
+      return;
+   }
+   myFirst= new value_type[count]();
+   myLast= myFirst+ count;
+   myEnd= myLast;
 
 }
 
@@ -26,37 +32,54 @@ vector::~vector()
       delete[] myFirst;
 }
 
-// Adds a new element at the end of the vector, after its current last element.
-// The content of val is copied to the new element.
-// This effectively increases the vector size by one,
-// which causes an automatic reallocation of the allocated storage space
-// if and only if the new vector size surpasses the current vector capacity.
-void vector::push_back( const value_type &val )
+// Resizes the vector so that it contains newSize elements.
+// If newSize is smaller than the current vector size,
+// the content is reduced to its first newSize elements, removing those beyond.
+// If newSize is greater than the current vector size,
+// the content is expanded by inserting at the end
+// as many elements as needed to reach a size of newSize.
+// The new elements are initialized as 0.
+// If newSize is also greater than the current vector capacity,
+// an automatic reallocation of the allocated storage space takes place.
+void vector::resize( const size_type newSize )
 {
    size_type originalSize = size();
-   size_type originalCapacity = capacity();
-   if( originalSize == originalCapacity )
+   if( newSize > originalSize )
    {
-      size_type newCapacity;
-      if( originalCapacity <= 1 )
-         newCapacity = originalCapacity + 1;
-      else
-         newCapacity = originalCapacity * 3 / 2;
+      if( newSize > capacity() )
+      {
+         size_type newCapacity = capacity() * 3 / 2;
+         if( newCapacity < newSize )
+            newCapacity = newSize;
 
+         value_type* newArr= new value_type[newCapacity]();
+         for(size_type i= 0; i< originalSize; i++){
 
+            newArr[i]= myFirst[i];
+         }
+         for(size_type i= originalSize; i< newCapacity; i++){
+
+            newArr[i]= value_type();
+         }
+         delete[] myFirst;
+         myFirst= newArr;
+         myLast= myFirst+ newSize;
+         myEnd= myFirst+ newCapacity;
+      }
+      else{
+         for(size_type i= originalSize; i< newSize; i++){
+
+            myFirst[i]= value_type();
+         }
+         myLast= myFirst+ newSize;
+      }
 
    }
+   else{
 
+      myLast= myFirst+ newSize;
+   }
 
-
-}
-
-// Removes the last element in the vector,
-// effectively reducing the container size by one.
-void vector::pop_back()
-{
-   if( size() > 0 )
-      --myLast;
 }
 
 // Removes all elements from the vector (which are destroyed),

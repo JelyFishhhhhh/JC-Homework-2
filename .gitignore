@@ -132,6 +132,8 @@ config.json
 *.db
 .tmp/
 results/
+
 .vscode/
-*exe
-*.dat
+*.exe
+
+4Testing/

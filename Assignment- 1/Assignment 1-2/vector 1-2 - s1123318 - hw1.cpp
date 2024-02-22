@@ -1,4 +1,4 @@
-#include "vector 1-1.h" // include definition of class vector 
+#include "vector 1-2.h" // include definition of class vector 
 
 // empty container constructor (default constructor)
 // Constructs an empty container, with no elements.
@@ -13,17 +13,13 @@ vector::vector()
 vector::vector( const size_type count )
 {
 
+   if(!count){
 
-
-}
-
-// copy constructor
-// Constructs a container with a copy of each of the elements in "right",
-// in the same order.
-vector::vector( const vector &right )
-{
-
-
+      return;
+   }
+   myFirst= new value_type[count]();
+   myLast= myFirst+ count;
+   myEnd= myLast;
 
 }
 
@@ -34,6 +30,46 @@ vector::~vector()
 {
    if( myFirst != nullptr )
       delete[] myFirst;
+}
+
+// Assigns new contents to the container, replacing its current contents,
+// and modifying its size accordingly.
+// Copies all the elements from "right" into the container
+// (with "right" preserving its contents).
+vector& vector::assign( const vector &right )
+{
+   if( this != &right ) // avoid self-assignment
+   {
+      size_type rightSize = right.myLast - right.myFirst;
+      if( rightSize > capacity() )
+      {
+         if( size() > 0 )
+            delete[] myFirst; // release space
+
+         size_type newCapacity = capacity() * 3 / 2;
+         if( newCapacity < rightSize )
+            newCapacity = rightSize;
+
+         myFirst= new value_type[newCapacity];
+         for(size_type i= 0; i< rightSize; i++){
+
+            myFirst[i]= right.myFirst[i];
+         }
+         myLast= myFirst+ rightSize;
+         myEnd= myFirst+ newCapacity;
+      }
+      else{
+
+         for(size_type i= 0; i< rightSize; i++){
+
+            myFirst[i]= right.myFirst[i];
+         }
+         myLast= myFirst+ rightSize;
+      }
+
+   }
+
+   return *this; // enables x = y = z, for example
 }
 
 // Removes all elements from the vector (which are destroyed),
