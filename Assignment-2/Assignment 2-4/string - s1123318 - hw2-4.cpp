@@ -25,7 +25,7 @@ string::string( const size_type count, const char ch )
 
    if(mySize> 15){
 
-      bx.ptr= new value_type[myRes]();
+      bx.ptr= new value_type[myRes+ 1]();
       for(size_type i= 0; i< mySize; i++){
 
          bx.ptr[i]= static_cast<value_type>(ch);
