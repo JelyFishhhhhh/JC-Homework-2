@@ -32,7 +32,9 @@ int main()
    {
       string wordToCheck;
       wordToCheck = dictionary[ rand() + dictionary.size() - 32768 ]; // skip short words
+      // cout<< "ori: "<< wordToCheck.c_str()<< '\n';
       wordToCheck.erase( rand() % wordToCheck.size(), 1 );
+      // cout<< "lat: "<< wordToCheck.c_str()<< '\n';
 
       if( !legal( wordToCheck, dictionary ) )
       {
@@ -81,8 +83,12 @@ void readTextFile( const char fileName[], vector &stringVector )
 
 bool legal( const string &wordToCheck, const vector &dictionary )
 {
-   for( size_t i = 0; i < dictionary.size(); i++ )
-      if( dictionary[ i ] == wordToCheck )
+   for( size_t i = 0; i < dictionary.size(); i++ ){
+
+      if( dictionary[ i ] == wordToCheck ){
+
          return true;
+      }
+   }
    return false;
 }

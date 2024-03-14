@@ -22,9 +22,26 @@ string::string( const char *const ptr, const size_type count )
    mySize = count;
    myRes = ( mySize / 16 ) * 16 + 15;
 
+   if(mySize> 15){
 
+      bx.ptr= new value_type[myRes+ 1]();
+      for(size_type i= 0; i< mySize; i++){
+
+         bx.ptr[i]= ptr[i];
+      }
+      bx.ptr[mySize]= value_type();
+      return;
+   }
+
+   for(size_type i= 0; i< mySize; i++){
+
+      bx.buf[i]= ptr[i];
+   }
+   bx.buf[mySize]= value_type();
 
 }
+
+
 
 string::string( const string &right )
    : bx(),
@@ -34,7 +51,28 @@ string::string( const string &right )
    mySize = right.mySize;
    myRes = ( mySize / 16 ) * 16 + 15;
 
+   if(mySize== 0){
 
+      return;
+   }
+
+   if(mySize> 15){
+      
+      bx.ptr= new value_type[myRes+ 1]();
+      for(size_type i= 0; i< mySize; i++){
+
+         bx.ptr[i] = right.bx.ptr ? right.bx.ptr[i] : right.bx.buf[i];
+      }
+      bx.ptr[mySize]= value_type();
+   }
+   else{
+   
+      for(size_type i= 0; i< mySize; i++){
+
+         bx.buf[i]= right[i];
+      }
+      bx.buf[mySize]= value_type();
+   }
 
 }
 
@@ -74,11 +112,34 @@ string& string::operator=( const string &right )
          if( myRes < ( right.mySize / 16 ) * 16 + 15 )
             myRes = ( right.mySize / 16 ) * 16 + 15;
 
+         bx.ptr= new value_type[myRes+ 1];
+         for(size_type i= 0; i< right.mySize; i++){
 
+            myPtr()[i]= right.myPtr()[i];
+         }
       }
+      else{
 
+         if(myRes> 15){
+   
+            for(size_type i= 0; i< right.mySize; i++){
+               
+               bx.ptr[i]= right.myPtr()[i];
+            }
 
+         }
+         else{
 
+            for(size_type i= 0; i< right.mySize; i++){
+               
+               myPtr()[i]= right.myPtr()[i];
+            }
+
+         }
+      }
+      
+      mySize= right.mySize;
+      myPtr()[mySize]= value_type();
    }
 
    return *this;
@@ -87,8 +148,18 @@ string& string::operator=( const string &right )
 bool string::operator==( const string &right ) const
 {
 
+   if(this->size()!=right.size()){
 
+      return false;
+   }
+   for(size_type i= 0; i< this->size(); i++){
 
+      if(myPtr()[i]!=right.myPtr()[i]){
+
+         return false;
+      }
+   }
+   return true;
 }
 
 bool string::operator!=( const string &right ) const
@@ -100,9 +171,21 @@ string& string::erase( const size_type off, size_type count )
 {
    if( off < mySize )
    {
+      
+      if(off+ count> mySize){
 
+         count= mySize- off;
+      }
+      
+      for(size_type i = off; i + count < mySize; ++i){
+         myPtr()[i] = myPtr()[i + count];
+      }
 
+      this->resize(mySize- count);
+      // for(size_type i= mySize- count; i< mySize; i++){
 
+      //    myPtr()[i]= value_type();
+      // }
    }
 
    return *this;
@@ -164,12 +247,36 @@ void string::push_back( char ch )
       if( newMyRes < ( ( mySize + 1 ) / 16 ) * 16 + 15 )
          newMyRes = ( ( mySize + 1 ) / 16 ) * 16 + 15;
 
+      value_type* newPtr= new value_type[newMyRes+ 1]();
+      for(size_type i= 0; i< mySize; i++){
 
+         newPtr[i]= myPtr()[i];
+      }
+      
+      if(myRes> 15){
 
+         delete[] bx.ptr;
+      }
+
+      newPtr[mySize++]= ch;
+      newPtr[mySize]= value_type();
+
+      bx.ptr= newPtr;
+      myRes= newMyRes;
    }
+   else{
 
+      if(mySize> 15){
 
+         myPtr()[mySize++]= ch;
+         myPtr()[mySize]= value_type();
+      }
+      else{
 
+         myPtr()[mySize++]= ch;
+         myPtr()[mySize]= value_type();
+      }
+   }
 }
 
 void string::pop_back()
@@ -222,15 +329,42 @@ void string::resize( const size_type newSize, const char ch )
          if( newMyRes < ( newSize / 16 ) * 16 + 15 )
             newMyRes = ( newSize / 16 ) * 16 + 15;
 
+         value_type* newPtr= new value_type[newMyRes+ 1]();
+         
+         for(size_type i= 0; i< mySize; i++){
 
+            newPtr[i]= myPtr()[i];
+         }
+         for(size_type i= mySize; i< newSize; i++){
 
+            newPtr[i]= ch;
+         }
+
+         newPtr[newSize]= value_type();
+
+         if(myRes> 15){
+
+            delete[] bx.ptr;
+         }
+         
+         bx.ptr= newPtr;
+         myRes= newMyRes;
       }
+      else{
+         
+         for(size_type i= mySize; i< newSize; i++){
 
-
-
+            myPtr()[i]= ch;
+         }
+         myPtr()[newSize]= value_type();
+      }
+      mySize= newSize;
    }
+   else if(newSize< mySize){
 
-
+      mySize= newSize;
+      myPtr()[mySize]= value_type();
+   }
 
 }
 

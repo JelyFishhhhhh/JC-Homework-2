@@ -18,7 +18,23 @@ vector::vector( const vector &right )
      myEnd()
 {
 
+   size_type vecSize= static_cast<size_type>(right.myLast- right.myFirst);
+   size_type vecCap= static_cast<size_type>(right.myEnd- right.myFirst);
 
+   if(!vecSize || !vecCap){
+
+      return;
+   }
+
+   myFirst= new value_type[vecCap]();
+   myLast= myFirst+ vecSize;
+   myEnd= myLast;
+
+   // copy value
+   for(size_type i= 0; i< vecSize; i++){
+
+      myFirst[i]= right.myFirst[i];
+   }
 
 }
 
@@ -47,13 +63,23 @@ void vector::push_back( const value_type &val )
          newCapacity = originalCapacity + 1;
       else
          newCapacity = originalCapacity * 3 / 2;
+      
+      value_type* newArr= new value_type[newCapacity];
+      for(size_type i= 0; i< originalSize; i++){
 
-
-
+         newArr[i]= myFirst[i];
+      }
+      newArr[originalSize]= val;
+      delete[] myFirst;
+      myFirst= newArr;
+      myLast= myFirst+ originalSize+ 1;
+      myEnd= myFirst+ newCapacity;
    }
-
-
-
+   else{
+      myFirst[originalSize]= val;
+      myLast= myFirst+ originalSize+ 1;
+      myEnd= myFirst+ originalCapacity;
+   }
 }
 
 // overloaded assignment operator
@@ -75,11 +101,22 @@ vector& vector::operator=( const vector &right )
          if( newCapacity < rightSize )
             newCapacity = rightSize;
 
+         myFirst= new value_type[newCapacity];
+         for(size_type i= 0; i< rightSize; i++){
 
-
+            myFirst[i]= right.myFirst[i];
+         }
+         myLast= myFirst+ rightSize;
+         myEnd= myFirst+ newCapacity;
       }
+      else{
 
+         for(size_type i= 0; i< rightSize; i++){
 
+            myFirst[i]= right.myFirst[i];
+         }
+         myLast= myFirst+ rightSize;
+      }
 
    }
 
@@ -106,14 +143,33 @@ void vector::resize( const size_type newSize )
          if( newCapacity < newSize )
             newCapacity = newSize;
 
+         value_type* newArr= new value_type[newCapacity]();
+         for(size_type i= 0; i< originalSize; i++){
 
+            newArr[i]= myFirst[i];
+         }
+         for(size_type i= originalSize; i< newCapacity; i++){
 
+            newArr[i]= value_type();
+         }
+         delete[] myFirst;
+         myFirst= newArr;
+         myLast= myFirst+ newSize;
+         myEnd= myFirst+ newCapacity;
+      }
+      else{
+         for(size_type i= originalSize; i< newSize; i++){
+
+            myFirst[i]= value_type();
+         }
+         myLast= myFirst+ newSize;
       }
 
-
-
    }
+   else{
 
+      myLast= myFirst+ newSize;
+   }
 
 }
 
