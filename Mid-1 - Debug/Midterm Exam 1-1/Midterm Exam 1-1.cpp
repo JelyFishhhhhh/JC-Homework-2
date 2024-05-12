@@ -72,7 +72,7 @@ void testInsert1()
             it1 = vector1.insert( vector1.begin() + position, value );
             it2 = vector2.insert( vector2.begin() + position, value );
 
-            if( !equal( vector1, vector2 ) && *it1 == *it2 )
+            if (!(equal(vector1, vector2) && *it1 == *it2))
                numErrors++;
          }
       }

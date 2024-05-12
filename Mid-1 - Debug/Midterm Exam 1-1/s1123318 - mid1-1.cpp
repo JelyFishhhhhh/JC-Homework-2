@@ -39,64 +39,46 @@ vector::iterator vector::insert( const_iterator where, const value_type &val )
    {
       size_type originalSize = size();
       size_type originalCapacity = capacity();
-      if (originalSize == originalCapacity)
+      if( originalSize == originalCapacity )
       {
          size_type newCapacity;
-         if (originalCapacity <= 1)
+         if( originalCapacity <= 1 )
             newCapacity = originalCapacity + 1;
          else
             newCapacity = originalCapacity * 3 / 2;
 
-         value_type position = where - myFirst;
-         value_type* temp = new value_type[newCapacity+1];
+         value_type* tempPtr = myFirst;
+         myFirst = new value_type[newCapacity]();
 
-         for (size_t i = 0; i < originalSize; i++)
-         {
-            temp[i] = myFirst[i];
+         for (size_type i = 0; i < where - tempPtr; i++) {
+
+             myFirst[i] = tempPtr[i];
          }
+         myFirst[where - tempPtr] = val;
+         for (size_type i = where - tempPtr+ 1; i < originalSize+ 1; i++) {
 
-         myFirst = new value_type[newCapacity + 1];
-
-         for (size_t i = 0; i < position; i++)
-         {
-            myFirst[i] = temp[i];
+             myFirst[i] = tempPtr[i- 1];
          }
-
-         myFirst[position] = val;
-
-         for (size_t i = position, j = 0; i < originalSize ; i++, j++)//modify
-         {
-            myFirst[i+1] =  temp[i];//modify
-         }
-
-         delete[] temp;//modify
-         myLast = myFirst + originalSize + 1;
+         myLast = myFirst + originalSize+ 1;
          myEnd = myFirst + newCapacity;
 
-         return myFirst + position;//modify
+         return myFirst + (where - tempPtr);
       }
       else
       {
-         value_type position = where - myFirst;
-         value_type buffer,tmp=val;//add
+         value_type buffer, tmp;
+         tmp = val;
+         for (size_type i = where- myFirst; i< originalSize+ 1; i++) {
 
-         // myFirst[position] = val;   delete
-
-         for (size_t i = position; i <originalSize + 1; i++)//modify
-         {
-            // myFirst[i] = myFirst[i - 1]; delete
-            buffer = myFirst[i]; //add
-            myFirst[i] = tmp; //add
-            tmp = buffer; //add
-
+            buffer= myFirst[i];
+            myFirst[i] = tmp;
+            tmp = buffer;
          }
-
-         myLast++;
-         myLast = myFirst + originalSize + 1;
-
-         return myFirst + position;//modify
+         myLast= myFirst+ originalSize+ 1;
+         myEnd = myFirst + capacity();
+         return myFirst + (where- myFirst);
       }
-
+      
    }
    else
       return nullptr;
